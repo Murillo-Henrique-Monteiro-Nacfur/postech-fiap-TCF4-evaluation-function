@@ -1,0 +1,90 @@
+# cloudbuild.yaml para deploy de Google Cloud Functions (2nd Gen)
+
+steps:
+  # Etapa 1: Fazer build completo do projeto, criando o uber-jar
+  - name: 'maven:3.9.6-eclipse-temurin-21'
+    id: 'Build'
+    entrypoint: 'mvn'
+    args:
+      - 'clean'
+      - 'package'
+      - '-DskipTests'
+      - '-Dquarkus.package.type=uber-jar'
+
+  # Etapa 2: Renomear o JAR para o nome esperado pelo Google Cloud Buildpacks
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'Rename JAR'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        mv target/serveless-test-pubsub-1.0.0-SNAPSHOT-runner.jar target/serveless-test-pubsub-1.0.0-SNAPSHOT.jar
+
+  # Etapa 3: Listar conteúdo do diretório 'target' para confirmar a renomeação
+  - name: 'ubuntu'
+    id: 'List Target'
+    entrypoint: 'ls'
+    args:
+      - '-R'
+      - 'target'
+
+  # Etapa 4: Deploy da função HTTP
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'functions'
+      - 'deploy'
+      - 'HelloWorldHttpFunction'
+      - '--source=.'
+      - '--runtime=java21'
+      - '--trigger-http'
+      - '--allow-unauthenticated'
+      - '--region=${_REGION}'
+      - '--project=${PROJECT_ID}'
+      - '--entry-point=com.postech.fiap.googlecloudfunctions.HelloWorldHttpFunction'
+      - '--gen2'
+
+  # Etapa 5: Criar tópico do Pub/Sub (se não existir)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'pubsub'
+      - 'topics'
+      - 'create'
+      - 'hello-world-topic'
+      - '--project=${PROJECT_ID}'
+    allow_failure: true  # Permite falha se o tópico já existir
+
+  # Etapa 6: Deploy da função Background
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'functions'
+      - 'deploy'
+      - 'HelloWorldBackgroundFunction'
+      - '--source=.'
+      - '--runtime=java21'
+      - '--trigger-event=google.storage.object.finalize'
+      - '--trigger-resource=hello-world-bucket'
+      - '--region=${_REGION}'
+      - '--project=${PROJECT_ID}'
+      - '--entry-point=com.postech.fiap.googlecloudfunctions.HelloWorldBackgroundFunction'
+      - '--gen2'
+
+  # Etapa 7: Deploy da função Cloud Events
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'functions'
+      - 'deploy'
+      - 'HelloWorldCloudEventsFunction'
+      - '--source=.'
+      - '--runtime=java21'
+      - '--trigger-topic=hello-world-topic'
+      - '--region=${_REGION}'
+      - '--project=${PROJECT_ID}'
+      - '--entry-point=com.postech.fiap.googlecloudfunctions.HelloWorldCloudEventsFunction'
+      - '--gen2'
+
+# Configuração de logging para o build
+logsBucket: 'gs://default-postech-fiap-build-logs'
