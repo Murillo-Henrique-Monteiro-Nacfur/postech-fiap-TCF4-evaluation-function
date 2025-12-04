@@ -1,5 +1,6 @@
-package com.postech.fiap.java;
+package com.postech.fiap;
 
+import com.postech.fiap.EvaluationFunction;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;

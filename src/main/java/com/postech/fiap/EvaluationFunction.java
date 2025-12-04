@@ -1,4 +1,4 @@
-package com.postech.fiap.java;
+package com.postech.fiap;
 
 import io.quarkus.funqy.Funq;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -27,7 +27,7 @@ public class EvaluationFunction {
      * @param payload O payload do Pub/Sub.
      */
     @Funq
-    public void processPubSubMessage(PubSubMessage payload) {
+    public void processNewEvaluation(PubSubMessage payload) {
         if (payload == null || payload.message == null) {
             System.out.println("Payload ou mensagem nulos.");
             return;
