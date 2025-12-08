@@ -1,17 +1,16 @@
 package com.postech.fiap;
 
-import com.postech.fiap.EvaluationFunction;
+import com.google.inject.Inject;
 import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
-@QuarkusTest
-class EvaluationFunctionTest {
 
-    @Inject
+class EvaluationEntityFunctionTest {
+
+
     EvaluationFunction function; // Injeta a função diretamente
 
-    @Test
+
     void testOnCloudEvent() {
         // 1. Prepara um CloudEvent de exemplo usando o builder
 //        CloudEvent event = CloudEvent.Builder()

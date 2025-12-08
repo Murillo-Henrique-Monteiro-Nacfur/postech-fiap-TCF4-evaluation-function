@@ -1,43 +1,29 @@
 package com.postech.fiap;
 
+import com.postech.fiap.dto.EvaluationDTO;
+import com.postech.fiap.model.EvaluationEntity;
+import com.postech.fiap.usecase.CreateEvaluationUseCase;
+import com.postech.fiap.usecase.EnviaAvisoDeUrgenciaUseCase;
 import io.quarkus.funqy.Funq;
 import jakarta.enterprise.context.ApplicationScoped;
-import java.util.Base64;
-import java.util.Map;
 
 @ApplicationScoped
 public class EvaluationFunction {
 
-    // Classe para representar a estrutura externa da mensagem do Pub/Sub
-    public static class PubSubMessage {
-        public Message message;
-        public String subscription;
+
+    private final CreateEvaluationUseCase createEvaluationUseCase;
+    private final EnviaAvisoDeUrgenciaUseCase enviaAvisoDeUrgenciaUseCase;
+
+    public EvaluationFunction(CreateEvaluationUseCase createEvaluationUseCase, EnviaAvisoDeUrgenciaUseCase enviaAvisoDeUrgenciaUseCase) {
+        this.createEvaluationUseCase = createEvaluationUseCase;
+        this.enviaAvisoDeUrgenciaUseCase = enviaAvisoDeUrgenciaUseCase;
     }
 
-    // Classe para representar o conteúdo da mensagem
-    public static class Message {
-        public String data; // O dado vem codificado em Base64
-        public Map<String, String> attributes;
-        public String messageId;
-    }
-
-    /**
-     * Esta função é acionada pelo Funqy e processa o wrapper JSON padrão do Pub/Sub.
-     * O Funqy mapeia automaticamente o JSON de entrada para o objeto PubSubMessage.
-     * @param payload O payload do Pub/Sub.
-     */
     @Funq
-    public void processNewEvaluation(PubSubMessage payload) {
-        if (payload == null || payload.message == null) {
-            System.out.println("Payload ou mensagem nulos.");
-            return;
+    public void processNewEvaluation(EvaluationDTO newEvaluation) {
+        createEvaluationUseCase.createEvaluation(new EvaluationEntity(newEvaluation.getDescricao(), newEvaluation.getNota()));
+        if (newEvaluation.getNota() < 5) {
+            enviaAvisoDeUrgenciaUseCase.enviaAvisoDeUrgencia();
         }
-
-        System.out.println("Receive event Id: " + payload.message.messageId);
-        System.out.println("Subscription: " + payload.subscription);
-
-        // Decodifica a mensagem de Base64 para String
-        String decodedData = new String(Base64.getDecoder().decode(payload.message.data));
-        System.out.println("Receive event Data: " + decodedData);
     }
 }
