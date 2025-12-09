@@ -78,7 +78,6 @@
     </dependencies>
 
     <build>
-        <finalName>serveless-test-pubsub-1.0.0-SNAPSHOT</finalName>
         <plugins>
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
