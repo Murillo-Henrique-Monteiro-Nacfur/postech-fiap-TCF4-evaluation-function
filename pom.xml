@@ -96,7 +96,13 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk</artifactId>
         </dependency>
-        <!-- Required for Function primitives pub/sub -->
+        
+        <!-- Dependência necessária para compressão Zstd no Netty/GraalVM -->
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+            <version>1.5.5-11</version>
+        </dependency>
     </dependencies>
 
     <build>
