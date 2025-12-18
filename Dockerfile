@@ -1,4 +1,4 @@
-# Estágio 1: Build Nativo (sem alterações, está funcionando)
+# Estágio 1: Build Nativo
 FROM vegardit/graalvm-maven:latest-java21 as build
 
 WORKDIR /app
