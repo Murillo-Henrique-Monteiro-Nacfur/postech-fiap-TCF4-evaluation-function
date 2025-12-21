@@ -1,5 +1,5 @@
 # Estágio 1: Build Nativo
-FROM vegardit/graalvm-maven:latest-java21 as build
+FROM vegardit/graalvm-maven:latest-java21 AS build
 
 WORKDIR /app
 COPY pom.xml .

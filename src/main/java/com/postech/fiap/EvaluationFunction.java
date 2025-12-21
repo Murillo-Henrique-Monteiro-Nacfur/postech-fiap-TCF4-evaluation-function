@@ -21,9 +21,10 @@ public class EvaluationFunction {
 
     @Funq
     public void processNewEvaluation(EvaluationDTO newEvaluation) {
-        createEvaluationUseCase.createEvaluation(new EvaluationEntity(newEvaluation.getDescricao(), newEvaluation.getNota()));
+        EvaluationEntity evaluation = new EvaluationEntity(newEvaluation.getDescricao(), newEvaluation.getNota());
+        createEvaluationUseCase.createEvaluation(evaluation);
         if (newEvaluation.getNota() < 5) {
-            enviaAvisoDeUrgenciaUseCase.enviaAvisoDeUrgencia();
+            enviaAvisoDeUrgenciaUseCase.enviaAvisoDeUrgencia(evaluation);
         }
     }
 }
