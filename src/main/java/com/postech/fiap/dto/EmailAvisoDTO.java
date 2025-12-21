@@ -1,7 +1,9 @@
 package com.postech.fiap.dto;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.List;
 
+@RegisterForReflection
 public class EmailAvisoDTO {
     private List<String> destinations;
     private String message;
