@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postech.fiap.dto.EmailAvisoDTO;
 import com.postech.fiap.gateway.AvisoUrgenciaGateway;
+import com.postech.fiap.model.AdministratorEntity;
 import com.postech.fiap.model.EvaluationEntity;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,7 +25,7 @@ public class EnviaAvisoDeUrgenciaUseCase {
                 "Descrição: " + newEvaluation.getDescription() + "\n" +
                 "Nota: " + newEvaluation.getRating() + "\n" +
                 "Data e Hora: " + newEvaluation.getDateHourCriation();
-        List<String> emails = PanacheEntityBase.find("SELECT a.email FROM AdministratorEntity a").project(String.class).list();
+        List<String> emails = AdministratorEntity.find("SELECT a.email FROM AdministratorEntity a").project(String.class).list();
         EmailAvisoDTO emailAvisoDTO = new EmailAvisoDTO(emails, message, "[URGENTE] - Avaliação com nota baixa");
         String avisoUrgenciaJson;
         try {
