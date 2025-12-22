@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 @ApplicationScoped
-public class GooglePubSubGateway implements AvisoUrgenciaGateway {
+public class GooglePubSubGateway implements UrgentWarningGateway {
 
     private static final Logger log = Logger.getLogger(GooglePubSubGateway.class);
 
@@ -33,7 +33,7 @@ public class GooglePubSubGateway implements AvisoUrgenciaGateway {
     }
 
     @Override
-    public void enviarAviso(String mensagem) {
+    public void sendWarning(String mensagem) {
         try {
             ByteString byteStr = ByteString.copyFrom(mensagem, StandardCharsets.UTF_8);
             PubsubMessage pubsubApiMessage = PubsubMessage.newBuilder().setData(byteStr).build();
