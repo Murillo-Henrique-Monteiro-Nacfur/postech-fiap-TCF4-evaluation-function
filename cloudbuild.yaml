@@ -19,6 +19,9 @@ availableSecrets:
     - versionName: "projects/$PROJECT_ID/secrets/db-postgresql-application-password/versions/latest"
       env: "DB_PASSWORD"
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
 steps:
   # 1) Run Flyway migrations using the SQL files in the repo
   - name: 'gcr.io/flyway/flyway'
