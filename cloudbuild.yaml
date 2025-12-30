@@ -20,7 +20,7 @@ steps:
 images:
   - '${_IMAGE}:$SHORT_SHA'
 
-# Optional: deploy to Cloud Run (uncomment and adjust region/service if needed)
+# Optional: deploy to Cloud Run (uncomment and adjust region/service if needed) teste
 # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
 #   entrypoint: 'bash'
 #   args:
