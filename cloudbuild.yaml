@@ -8,31 +8,28 @@ options:
   machineType: 'E2_HIGHCPU_8'  # 8 vCPUs, 7.2 GB RAM
   diskSizeGb: 100  # Aumenta espaço em disco para build nativo
 
-substitutions:
-  _IMAGE: "gcr.io/${_PROJECT_ID}/evaluation-function"
-
 steps:
   # Build Docker image (native binary Dockerfile already in repo)
   - name: 'gcr.io/cloud-builders/docker'
     args: 
       - 'build'
       - '-t'
-      - '${_IMAGE}:$SHORT_SHA'
+      - 'gcr.io/$PROJECT_ID/evaluation-function:$SHORT_SHA'
       - '-t'
-      - '${_IMAGE}:latest'
+      - 'gcr.io/$PROJECT_ID/evaluation-function:latest'
       - '.'
 
   # Push image to Container Registry / Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_IMAGE}:$SHORT_SHA']
+    args: ['push', 'gcr.io/$PROJECT_ID/evaluation-function:$SHORT_SHA']
 
   # Push latest tag também
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', '${_IMAGE}:latest']
+    args: ['push', 'gcr.io/$PROJECT_ID/evaluation-function:latest']
 
 images:
-  - '${_IMAGE}:$SHORT_SHA'
-  - '${_IMAGE}:latest'
+  - 'gcr.io/$PROJECT_ID/evaluation-function:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/evaluation-function:latest'
 
 # Optional: deploy to Cloud Run (uncomment and adjust region/service if needed) teste
 # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
