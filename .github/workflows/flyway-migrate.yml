@@ -18,4 +18,4 @@ jobs:
           DB_PASS: ${{ secrets.DB_PASS }}
         run: |
           docker run --rm -v "${{ github.workspace }}/src/main/resources/db/migration":/flyway/sql \
-            flyway/flyway:9 -url="$DB_URL" -user="$DB_USER" -password="$DB_PASS" migrate
+            flyway/flyway:11.12.0 -url="$DB_URL" -user="$DB_USER" -password="$DB_PASS" migrate
