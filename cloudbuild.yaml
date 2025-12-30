@@ -27,18 +27,22 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/evaluation-function:latest']
 
+  # Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy evaluation-function \
+          --image gcr.io/$PROJECT_ID/evaluation-function:$SHORT_SHA \
+          --region southamerica-east1 \
+          --platform managed \
+          --port 8080 \
+          --allow-unauthenticated \
+          --quiet
+
 images:
   - 'gcr.io/$PROJECT_ID/evaluation-function:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/evaluation-function:latest'
 
-# Optional: deploy to Cloud Run (uncomment and adjust region/service if needed) teste
-# - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-#   entrypoint: 'bash'
-#   args:
-#     - '-c'
-#     - |
-#       gcloud run deploy evaluation-function \
-#         --image ${_IMAGE}:$SHORT_SHA \
-#         --region southamerica-east1 \
-#         --platform managed \
-#         --quiet
+
