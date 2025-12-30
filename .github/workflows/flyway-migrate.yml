@@ -2,7 +2,7 @@ name: Migrate & Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 jobs:
   migrate:
