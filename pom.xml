@@ -121,6 +121,13 @@
             <artifactId>guava</artifactId>
             <version>32.1.3-jre</version>
         </dependency>
+
+        <!-- Flyway for DB migrations (used by CI / local dev) -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>9.22.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -177,6 +184,13 @@
                         <maven.home>${maven.home}</maven.home>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <!-- Flyway maven plugin for local/CI usage -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>9.22.0</version>
             </plugin>
         </plugins>
     </build>

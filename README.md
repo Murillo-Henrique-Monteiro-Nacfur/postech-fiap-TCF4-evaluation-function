@@ -83,6 +83,42 @@ Existe um gatilho configurado no GCP conectado a este repositório.
     *   O Cloud Build executa o comando Docker para criar a imagem nativa.
     *   A imagem é enviada para o **Google Container Registry (GCR)** ou **Artifact Registry**.
     *   O serviço **Cloud Run / Cloud Functions** é atualizado com a nova imagem.
+---
+
+## 🗄️ Migrações de Banco de Dados (Flyway)
+
+Este repositório inclui suporte a **migrations** com **Flyway**. A estratégia adotada é rodar as migrações no momento do deploy (pipeline do Cloud Build) para garantir que as mudanças no schema ocorram antes do deploy da imagem.
+
+- **Como funciona no pipeline:** o `cloudbuild.yaml` tem um step que executa o container oficial `gcr.io/flyway/flyway` apontando para `src/main/resources/db/migration` e executa `migrate` usando credenciais obtidas do **Secret Manager**.
+
+- **Setup de segredos (exemplo):**
+
+```bash
+# Crie secrets no Secret Manager
+gcloud secrets create DB_URL --data-file=- <<<"jdbc:postgresql://HOST:5432/DBNAME"
+gcloud secrets create DB_USER --data-file=- <<<"myuser"
+gcloud secrets create DB_PASS --data-file=- <<<"mypassword"
+
+# Dê permissão ao service account do Cloud Build se necessário
+gcloud secrets add-iam-policy-binding DB_PASS --member=serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com --role=roles/secretmanager.secretAccessor
+```
+
+**Observação (Cloud Run):** no seu ambiente atual a Cloud Run está usando o secret `db-postgresql-application-password` para a variável `DB_PASSWORD`. Se quiser manter esse nome, adicione também esse secret ao Secret Manager e garanta que o Cloud Build tenha acesso a ele (ex.: `db-postgresql-application-password`).
+
+Após fazer deploy, associe explicitamente o secret ao serviço (se não estiver configurado):
+
+```bash
+# Associa o secret ao serviço Cloud Run (bind no runtime)
+gcloud run services update evaluation-function --region=southamerica-east1 --update-secrets DB_PASSWORD=projects/$PROJECT_ID/secrets/db-postgresql-application-password:latest
+```
+
+
+- **Observações:**
+  * Teste as migrações em um ambiente de staging antes de rodar em produção.
+  * Faça backups/snapshots do banco antes de executar migrações destrutivas.
+  * A pasta de migrations está em `src/main/resources/db/migration`.
+
+---
 
 ---
 
