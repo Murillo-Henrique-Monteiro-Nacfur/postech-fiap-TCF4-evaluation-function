@@ -1,0 +1,33 @@
+# Cloud Build config for repository
+# - Builds and pushes Docker image
+# - Sets logging so triggers using a serviceAccount are accepted
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _IMAGE: "gcr.io/$PROJECT_ID/evaluation-function"
+
+steps:
+  # Build Docker image (native binary Dockerfile already in repo)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE}:$SHORT_SHA', '.']
+
+  # Push image to Container Registry / Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE}:$SHORT_SHA']
+
+images:
+  - '${_IMAGE}:$SHORT_SHA'
+
+# Optional: deploy to Cloud Run (uncomment and adjust region/service if needed)
+# - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#   entrypoint: 'bash'
+#   args:
+#     - '-c'
+#     - |
+#       gcloud run deploy evaluation-function \
+#         --image ${_IMAGE}:$SHORT_SHA \
+#         --region southamerica-east1 \
+#         --platform managed \
+#         --quiet

@@ -83,6 +83,8 @@ Existe um gatilho configurado no GCP conectado a este repositório.
     *   O Cloud Build executa o comando Docker para criar a imagem nativa.
     *   A imagem é enviada para o **Google Container Registry (GCR)** ou **Artifact Registry**.
     *   O serviço **Cloud Run / Cloud Functions** é atualizado com a nova imagem.
+
+    *   Este repositório inclui um `cloudbuild.yaml` que o trigger pode usar. Ele define `options.logging: CLOUD_LOGGING_ONLY` (necessário quando o trigger usa um `serviceAccount`) e contém os steps de build/push da imagem. Por padrão **não** executa as migrations — se quiser que as migrations rodem durante o build, posso re-adicionar a etapa do Flyway (e aí será necessário conceder ao Cloud Build acesso ao Secret Manager, por exemplo com `roles/secretmanager.secretAccessor`).
 ---
 
 ## 🗄️ Migrações de Banco de Dados (Flyway)
