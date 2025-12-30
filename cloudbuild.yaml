@@ -4,6 +4,10 @@
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  # Aumenta recursos para build nativo do Quarkus
+  machineType: 'E2_HIGHCPU_8'  # 8 vCPUs, 7.2 GB RAM
+  diskSizeGb: 100  # Aumenta espaço em disco para build nativo
+  timeout: '3600s'  # 1 hora de timeout (build nativo pode demorar)
 
 substitutions:
   _IMAGE: "gcr.io/${_PROJECT_ID}/evaluation-function"
@@ -11,14 +15,28 @@ substitutions:
 steps:
   # Build Docker image (native binary Dockerfile already in repo)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '${_IMAGE}:$SHORT_SHA', '.']
+    args: 
+      - 'build'
+      - '-t'
+      - '${_IMAGE}:$SHORT_SHA'
+      - '-t'
+      - '${_IMAGE}:latest'
+      - '.'
+    timeout: '3600s'  # Timeout específico para este step
 
   # Push image to Container Registry / Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', '${_IMAGE}:$SHORT_SHA']
+    timeout: '600s'
+
+  # Push latest tag também
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE}:latest']
+    timeout: '600s'
 
 images:
   - '${_IMAGE}:$SHORT_SHA'
+  - '${_IMAGE}:latest'
 
 # Optional: deploy to Cloud Run (uncomment and adjust region/service if needed) teste
 # - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'

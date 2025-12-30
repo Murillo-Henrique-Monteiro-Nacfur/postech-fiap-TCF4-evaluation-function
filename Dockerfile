@@ -5,6 +5,8 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
+# Aumenta memória disponível para o build nativo (necessário para Cloud Build)
+ENV MAVEN_OPTS="-Xmx4g -XX:MaxRAMPercentage=75.0"
 RUN mvn package -Pnative -DskipTests
 
 # Estágio 2: Imagem final com Debian Slim - leve e comprovadamente compatível
