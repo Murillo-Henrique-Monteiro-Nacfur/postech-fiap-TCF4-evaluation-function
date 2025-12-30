@@ -1,0 +1,21 @@
+name: Migrate & Build
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  migrate:
+    name: Run Flyway migrations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Flyway (Docker)
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+        run: |
+          docker run --rm -v "${{ github.workspace }}/src/main/resources/db/migration":/flyway/sql \
+            flyway/flyway:9 -url="$DB_URL" -user="$DB_USER" -password="$DB_PASS" migrate
