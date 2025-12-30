@@ -6,7 +6,7 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  _IMAGE: "gcr.io/$PROJECT_ID/evaluation-function"
+  _IMAGE: "gcr.io/$_PROJECT_ID/evaluation-function"
 
 steps:
   # Build Docker image (native binary Dockerfile already in repo)
