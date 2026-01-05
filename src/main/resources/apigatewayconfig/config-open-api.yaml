@@ -1,0 +1,65 @@
+# openapi-config.yaml
+
+swagger: "2.0"
+info:
+  title: API Gateway para Avaliações
+  description: "Recebe uma avaliação e a encaminha para o backend."
+  version: 1.0.0
+
+schemes:
+  - https
+
+produces:
+  - application/json
+
+basePath: /
+
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"
+
+paths:
+  /v1/evaluations:
+    post:
+      summary: Envia uma nova avaliação.
+      description: "Recebe um objeto de avaliação e o encaminha diretamente para o backend."
+      operationId: processEvaluation
+      security:
+        - api_key: []
+      parameters:
+        - in: body
+          name: body
+          description: O objeto de avaliação a ser processado.
+          required: true
+          schema:
+            $ref: "#/definitions/EvaluationPayload"
+      responses:
+        "202":
+          description: "Requisição aceita e encaminhada ao backend."
+        "403":
+          description: "API Key inválida ou ausente."
+
+      x-google-backend:
+        # Endereço completo para o endpoint de destino.
+        address: https://evaluation-function-241672042524.southamerica-east1.run.app/processNewEvaluation
+        path_translation: CONSTANT_ADDRESS
+
+# Definições dos schemas
+definitions:
+  EvaluationPayload:
+    type: object
+    description: "Formato simples para enviar uma avaliação."
+    required:
+      - nota
+    properties:
+      nota: # Campo alterado conforme solicitado
+        type: integer
+        format: int32
+        description: "A nota da avaliação (ex: 1 a 10)."
+        example: 10
+      descricao:
+        type: string
+        description: "Um comentário opcional sobre a avaliação."
+        example: "Serviço excelente!"
