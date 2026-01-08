@@ -1,0 +1,56 @@
+{
+	"info": {
+		"_postman_id": "06a5165a-93f8-4eb8-9001-02f2f62732e5",
+		"name": "Fase 4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "7641865"
+	},
+	"item": [
+		{
+			"name": "Request gateway /evaluations",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "User-Agent",
+						"value": "insomnia/12.1.0"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"descricao\": \"Um bom Curso\",\n\t\"nota\": 6\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://evaluation-api-330talgc.ue.gateway.dev/v1/evaluations?key=MCGE3kyeqQcs97ZDisJ8rAIzaSyDEzu-OiCTr2bV",
+					"protocol": "https",
+					"host": [
+						"evaluation-api-330talgc",
+						"ue",
+						"gateway",
+						"dev"
+					],
+					"path": [
+						"v1",
+						"evaluations"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "MCGE3kyeqQcs97ZDisJ8rAIzaSyDEzu-OiCTr2bV"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

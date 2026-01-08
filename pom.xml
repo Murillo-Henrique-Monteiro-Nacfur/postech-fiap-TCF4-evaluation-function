@@ -37,7 +37,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-smallrye-health</artifactId>
         </dependency>
-        <!-- Dependências Funqy para suportar múltiplos gatilhos -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-funqy-http</artifactId>
@@ -83,7 +82,6 @@
             <artifactId>quarkus-jdbc-postgresql</artifactId>
             <version>${quarkus.platform.version}</version>
         </dependency>
-        <!-- Required for Function primitives pub/sub -->
 
         <dependency>
             <groupId>io.quarkiverse.googlecloudservices</groupId>
@@ -107,22 +105,19 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk</artifactId>
         </dependency>
-        
-        <!-- Dependência necessária para compressão Zstd no Netty/GraalVM -->
+
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
             <version>1.5.5-11</version>
         </dependency>
 
-        <!-- Dependência do Google Guava para resolver problemas de classe não encontrada -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>32.1.3-jre</version>
         </dependency>
 
-        <!-- Flyway for DB migrations (used by CI / local dev) -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
