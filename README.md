@@ -89,37 +89,24 @@ Existe um gatilho configurado no GCP conectado a este repositório.
 
 ## 🗄️ Migrações de Banco de Dados (Flyway)
 
-Este repositório inclui suporte a **migrations** com **Flyway**. A estratégia adotada é rodar as migrações no momento do deploy (pipeline do Cloud Build) para garantir que as mudanças no schema ocorram antes do deploy da imagem.
+Este repositório inclui suporte a **migrations** com **Flyway**. A estratégia adotada é rodar as migrações durante o workflow do github actions / cloud build, antes do deploy da nova versão da aplicação.
 
-- **Como funciona no pipeline:** o `cloudbuild.yaml` tem um step que executa o container oficial `gcr.io/flyway/flyway` apontando para `src/main/resources/db/migration` e executa `migrate` usando credenciais obtidas do **Secret Manager**.
-
-- **Setup de segredos (exemplo):**
-
-```bash
-# Crie secrets no Secret Manager
-gcloud secrets create DB_URL --data-file=- <<<"jdbc:postgresql://HOST:5432/DBNAME"
-gcloud secrets create DB_USER --data-file=- <<<"myuser"
-gcloud secrets create DB_PASS --data-file=- <<<"mypassword"
-
-# Dê permissão ao service account do Cloud Build se necessário
-gcloud secrets add-iam-policy-binding DB_PASS --member=serviceAccount:PROJECT_NUMBER@cloudbuild.gserviceaccount.com --role=roles/secretmanager.secretAccessor
-```
-
-**Observação (Cloud Run):** no seu ambiente atual a Cloud Run está usando o secret `db-postgresql-application-password` para a variável `DB_PASSWORD`. Se quiser manter esse nome, adicione também esse secret ao Secret Manager e garanta que o Cloud Build tenha acesso a ele (ex.: `db-postgresql-application-password`).
-
-Após fazer deploy, associe explicitamente o secret ao serviço (se não estiver configurado):
-
-```bash
-# Associa o secret ao serviço Cloud Run (bind no runtime)
-gcloud run services update evaluation-function --region=southamerica-east1 --update-secrets DB_PASSWORD=projects/$PROJECT_ID/secrets/db-postgresql-application-password:latest
-```
-
-
-- **Observações:**
-  * Teste as migrações em um ambiente de staging antes de rodar em produção.
-  * Faça backups/snapshots do banco antes de executar migrações destrutivas.
-  * A pasta de migrations está em `src/main/resources/db/migration`.
-
+- **Vantagens:**
+  * Migrações são aplicadas automaticamente durante o pipeline CI/CD.
+  * Garante que o banco de dados esteja sempre atualizado com a versão da aplicação.
+  * Evita a necessidade de rodar migrações manualmente em produção.
+- Permite versionar as mudanças de esquema junto com o código-fonte.
+- **Configuração do Flyway:**
+  * As migrations estão na pasta `src/main/resources/db/migration`.
+  * O Flyway é configurado para usar variáveis de ambiente para conexão com o banco que devem ser criada no repositorio do github nas secrets
+    - `FLYWAY_URL`
+    - `FLYWAY_USER`
+    - `FLYWAY_PASSWORD`
+  - No workflow do github actions, há um step que executa o comando:
+    ```bash
+    ./mvnw flyway:migrate
+    ```
+  - Isso aplica todas as migrations pendentes antes de prosseguir com o build e deploy.
 ---
 
 ---

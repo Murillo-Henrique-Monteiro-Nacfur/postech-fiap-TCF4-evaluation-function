@@ -1,6 +1,7 @@
 package com.postech.fiap.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.http.HttpServerResponse;
 import jakarta.interceptor.InvocationContext;
 import org.jboss.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,10 +34,14 @@ class FunctionExceptionHandlerInterceptorTest {
     @Mock
     private InvocationContext context;
 
+    @Mock
+    private HttpServerResponse response;
+
     @BeforeEach
     void setUp() throws Exception {
         setPrivateField(interceptor, "log", log);
         setPrivateField(interceptor, "objectMapper", objectMapper);
+        setPrivateField(interceptor, "response", response);
     }
 
     private void setPrivateField(Object target, String fieldName, Object value) throws Exception {
@@ -62,15 +67,23 @@ class FunctionExceptionHandlerInterceptorTest {
         String errorMessage = "Business error";
         String errorCode = "ERR_001";
         EvaluationFunctionException exception = new EvaluationFunctionException(errorMessage, errorCode);
+        String jsonError = "{\"message\":\"Business error\",\"code\":\"ERR_001\"}";
 
         when(context.proceed()).thenThrow(exception);
-        when(objectMapper.writeValueAsString(any(ErrorDTO.class))).thenReturn("{\"message\":\"Business error\"}");
+        when(objectMapper.writeValueAsString(any(ErrorDTO.class))).thenReturn(jsonError);
+
+        when(response.setStatusCode(506)).thenReturn(response);
+        when(response.putHeader(anyString(), anyString())).thenReturn(response);
 
         Object result = interceptor.handleException(context);
 
         assertThat(result).isNull();
-        verify(log).error(contains("Business Error processed: {\"message\":\"Business error\"}"));
-        verify(objectMapper).writeValueAsString(any(ErrorDTO.class));
+
+        verify(response).setStatusCode(506);
+        verify(response).putHeader("Content-Type", "application/json");
+        verify(response).end(jsonError);
+        verify(log).error(contains("Business Error processed: " + jsonError));
+        verify(objectMapper, atLeastOnce()).writeValueAsString(any(ErrorDTO.class));
     }
 
     @Test
@@ -82,6 +95,6 @@ class FunctionExceptionHandlerInterceptorTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Unexpected error");
 
-        verify(log).error("Unexpected Error processing function",exception);
+        verify(log).error("Unexpected Error processing function", exception);
     }
 }

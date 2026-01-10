@@ -1,5 +1,3 @@
-# openapi-config.yaml
-
 swagger: "2.0"
 info:
   title: API Gateway para Avaliações
@@ -10,6 +8,9 @@ schemes:
   - https
 
 produces:
+  - application/json
+
+consumes:
   - application/json
 
 basePath: /
@@ -35,14 +36,22 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/EvaluationPayload"
+
       responses:
         "202":
           description: "Requisição aceita e encaminhada ao backend."
         "403":
           description: "API Key inválida ou ausente."
+        "406":
+          description: "Erro de negócio: A nota deve estar entre 0 e 10."
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "500":
+          description: "Erro interno no processamento do backend."
+          schema:
+            $ref: "#/definitions/ErrorResponse"
 
       x-google-backend:
-        # Endereço completo para o endpoint de destino.
         address: https://evaluation-function-241672042524.southamerica-east1.run.app/processNewEvaluation
         path_translation: CONSTANT_ADDRESS
 
@@ -54,7 +63,7 @@ definitions:
     required:
       - nota
     properties:
-      nota: # Campo alterado conforme solicitado
+      nota:
         type: integer
         format: int32
         description: "A nota da avaliação (ex: 1 a 10)."
@@ -63,3 +72,20 @@ definitions:
         type: string
         description: "Um comentário opcional sobre a avaliação."
         example: "Serviço excelente!"
+
+  # NOVO: Definição para capturar o erro do seu ExceptionHandlerInterceptor
+  ErrorResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        description: "Mensagem detalhada do erro."
+        example: "A nota deve estar entre 0 e 10."
+      code:
+        type: string
+        description: "Código interno do erro."
+        example: "INVALID_RATING"
+      timestamp:
+        type: string
+        description: "Data e hora do erro."
+        example: "2026-01-08T20:43:53.406259"

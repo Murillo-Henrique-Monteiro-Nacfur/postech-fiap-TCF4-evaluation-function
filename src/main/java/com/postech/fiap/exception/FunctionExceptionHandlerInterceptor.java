@@ -1,8 +1,8 @@
 package com.postech.fiap.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.vertx.core.http.HttpServerResponse;
 import jakarta.annotation.Priority;
-import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
@@ -13,11 +13,15 @@ import org.jboss.logging.Logger;
 @Priority(Interceptor.Priority.APPLICATION)
 public class FunctionExceptionHandlerInterceptor {
 
-    @Inject
     Logger log;
-
-    @Inject
     ObjectMapper objectMapper;
+    HttpServerResponse response;
+
+    public FunctionExceptionHandlerInterceptor(Logger log, ObjectMapper objectMapper, HttpServerResponse response) {
+        this.log = log;
+        this.objectMapper = objectMapper;
+        this.response = response;
+    }
 
     @AroundInvoke
     public Object handleException(InvocationContext context) throws Exception {
@@ -25,6 +29,9 @@ public class FunctionExceptionHandlerInterceptor {
             return context.proceed();
         } catch (EvaluationFunctionException e) {
             ErrorDTO error = new ErrorDTO(e.getMessage(), e.getCode());
+            response.setStatusCode(506)
+                    .putHeader("Content-Type", "application/json")
+                    .end(objectMapper.writeValueAsString(error));
             log.error("Business Error processed: " + objectMapper.writeValueAsString(error));
             return null;
         } catch (Exception e) {
